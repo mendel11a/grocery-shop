@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import transactionRoutes from "./routes/transactions.js";
-import Transaction from "./models/Transaction.js";
-import sampleData from "./data.js"
+import { logger } from "./logs/logger.js"
 
 const app = express();
 app.use(cors());
@@ -40,15 +39,8 @@ app.use((err, req, res, next) => {
     });
 }); //middleware that helps handling error in express
 
-// //Populate database with sample data
-// Transaction.insertMany(sampleData).then(function(){
-//     console.log("Data inserted")  // Success
-// }).catch(function(error){
-//     console.log(error)      // Failure
-// });
-
 // Connect to server
 app.listen(port, () => {
     connect();
-    console.log(`Server running on port ${port}`);
+    logger.info(`Server running on port ${port}`);
 });
