@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import Error from "../components/Error"
 
 import LineChart from "../components/LineChart";
 import Header from "../components/Header";
@@ -23,16 +24,24 @@ const Home = () => {
     const [transactions, setTransactions] = useState([]);
     const [fromDate, setFromDate] = useState("2021-06-01");
     const [toDate, setToDate] = useState("2021-12-31");
+    const [error, setError] = useState("")
 
     useEffect(() => {
         fetchTransactions();
     }, []);
 
     const fetchTransactions = async () => {
-        const res = await axios.get(
-            `/transactions?from=${fromDate}&to=${toDate}`
-        );
-        setTransactions(res.data);
+        try {
+            const res = await axios.get(
+                `/transactions?from=${fromDate}&to=${toDate}`
+            );
+            setTransactions(res.data);
+        } catch (err) {
+            if(err.response.status===500) {
+                setTransactions([])
+                setError("Server is down")
+            }
+        }
     };
 
     return (
@@ -44,15 +53,16 @@ const Home = () => {
                     type="date"
                     value={fromDate}
                     setData={setFromDate}
-                />
+                    />
                 <DateInput
                     text="To"
                     type="date"
                     value={toDate}
                     setData={setToDate}
-                />
+                    />
                 <FilterButton fetchTransactions={fetchTransactions} />
             </Wrapper>
+                    {error && <Error errorMessage={error} />}
             <LineChart transactions={transactions} />
             <Footer />
         </Container>
